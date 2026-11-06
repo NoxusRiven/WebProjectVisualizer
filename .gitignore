@@ -4,7 +4,8 @@
 FuncVisualizer
 PassKeeper
 
-WebServer-ProjectTODO/index_debug.html
-WebServer-ProjectTODO/bin
+*/index_debug.html
+*/bin
 
-WebServer-ProjectTODO/files/TODO/project_copy.json
+*/*/*/project_copy.json
+*/*/*/project.json

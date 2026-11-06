@@ -9,7 +9,7 @@
 
 namespace JSON
 {
-    struct JsonValue;
+    class JsonValue;
     using j_object = std::map<std::string, JsonValue>;
     using j_array = std::vector<JsonValue>;
     using j_null = std::monostate;
@@ -48,6 +48,12 @@ namespace JSON
                 exit(-1);
             }
             return std::get<T>(_data);
+        }
+
+        template<typename T>
+        bool is()
+        {
+            return std::holds_alternative<T>(_data);
         }
 
         //helper for debugging

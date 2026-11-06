@@ -33,26 +33,18 @@ void Task::mark_unfinished()
 }
 
 
-Comment::Comment(long id, std::string content) : id(id), text(content) {}
 
 Objective::Objective(long id, std::string name, Priority priority) : id(id), name(name), priority(priority)
 {
-    comments.reserve(16);
     tasks.reserve(16);
 }
 
 
 //TODO: fix id in this method
-void Objective::add(std::string data)
+void Objective::add(Task task)
 {
-    if(data.starts_with("//"))
-    {
-        this->comments.push_back(Comment{0, data});
-    }
-    else
-    {
-        this->tasks.push_back(Task{0, data});
-    }
+    
+    this->tasks.push_back(task);
 }
 
 Project::Project(long id, std::string name) : id(id), name(name)
@@ -69,12 +61,6 @@ void Project::print()
     {
         std::cout << "  - Objective: " << obj.name << "\n";
         std::cout << "    * Priority: " << std::to_string(int(obj.priority)) << "\n";
-
-        std::cout << "    * Comments:\n";
-        for (const auto& comment : obj.comments)
-        {
-            std::cout << "      > " << comment.text << "\n";
-        }
 
         std::cout << "    * Tasks:\n";
         for (const auto& task : obj.tasks)

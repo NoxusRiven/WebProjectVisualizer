@@ -237,10 +237,7 @@ function addElement(btn)
         input = document.createElement("input");
         base = input;
 
-        input.className =
-            request.type === "task"
-                ? "task-indent"
-                : "comment-indent";
+        input.className = "task-indent";
     }
 
     btn.parentNode.insertBefore(base, btn);

@@ -16,7 +16,37 @@ void read_projects_json(std::string_view file_name, ProjectArchive* proj_arch)
     JSON::JSON_Parser parser;
     std::cout << "calling read_json\n";
     std::cout << "file_name: " << file_name << "\n";
-    JSON::JsonValue json = parser.parse(file_name.data());
+    JSON::JsonValue json = parser.parse(file_name);
+    
+    //if json is null, file not found, create one
+    if(json.is<JSON::j_null>())
+    {
+        std::cout << "Json file is null\n";
+        std::ofstream file(file_name.data());
+        if(!file.is_open())
+        {
+            std::cout << "Cound't create file '" << file_name << "'\n";
+            exit(-1);
+        }
+
+        file << "{}\n";
+        file.flush();
+        file.close();
+
+        //call parse again
+        json = parser.parse(file_name);
+        if(json.is<JSON::j_null>())
+        {
+            std::cout << "Unreachable! created file and json still was null\n";
+        } 
+    }
+
+    if(!json.get_as<JSON::j_object>().contains("projects"))
+    {
+        std::cout << "Empty json file\n";
+        return;
+    }
+
     JSON::JsonValue json_projects = json["projects"];
 
     auto& projects = proj_arch->projects;
@@ -39,17 +69,6 @@ void read_projects_json(std::string_view file_name, ProjectArchive* proj_arch)
                         obj["priority"].get_as<double>()
                     )
                 );
-
-                // Comments
-                for (auto& comment : obj["comments"].get_as<JSON::j_array>())
-                {
-                    Comment c(
-                        comment["id"].get_as<double>(),
-                        comment["text"].get_as<std::string>()
-                    );
-
-                    objective.comments.push_back(std::move(c));
-                }
 
                 // Tasks
                 for (auto& task : obj["tasks"].get_as<JSON::j_array>())
@@ -81,9 +100,6 @@ void read_projects_json(std::string_view file_name, ProjectArchive* proj_arch)
         for (auto& obj : p.objectives)
         {
             proj_arch->elements.try_emplace(obj.id, &obj);
-
-            for (auto& c : obj.comments)
-                proj_arch->elements.try_emplace(c.id, &c);
 
             for (auto& t : obj.tasks)
                 proj_arch->elements.try_emplace(t.id, &t);
@@ -117,26 +133,6 @@ void save_projects_json(std::string_view file_name, ProjectArchive *proj_arch)
             json_file << "\"id\": " << obj.id << ",\n";
             json_file << "\"name\": \"" << obj.name << "\",\n";
             json_file << "\"priority\": " << (int)obj.priority << ",\n";
-
-            // ---------- comments ----------
-            json_file << "\"comments\": [\n";
-
-            for(size_t c = 0; c < obj.comments.size(); ++c)
-            {
-                auto& com = obj.comments[c];
-
-                json_file << "{\n";
-                json_file << "\"id\": " << com.id << ",\n";
-                json_file << "\"text\": \"" << com.text << "\"\n";
-                json_file << "}";
-
-                if(c + 1 != obj.comments.size())
-                    json_file << ",";
-
-                json_file << "\n";
-            }
-
-            json_file << "],\n";
 
             // ---------- tasks ----------
             json_file << "\"tasks\": [\n";
@@ -199,6 +195,8 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
 
         std::string to_find = "{{BODY}}";
 
+        auto base_body = DomElement("");
+
         bool found = false;
         Project* current_project;
         for(auto& proj : projects)
@@ -212,7 +210,6 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
 
         if(found)
         {
-            auto base_body = DomElement("");
 
             for(auto& obj : current_project->objectives)
             {
@@ -242,17 +239,6 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
                     );
                 }
 
-                for(auto c : obj.comments)
-                {
-                    base_body.append(
-                        DomElement("div").set_attr({{"class", "comment"}, {"data-id", std::to_string(c.id)}})
-                            .append(
-                                DomElement("p")
-                                    .append(c.text)
-                            )
-                    );
-                }
-
                 base_body
                     .append(
                         DomElement("button").set_attr({ {"class", "task-indent"},
@@ -272,21 +258,23 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
                         .append("Add objective")
                 );
 
-            //TODO: extract this to func/method in html_renderer
-            HTML_Renderer renderer(base_body);
+            
 
-            size_t pos = msg->find(to_find);
+        }
 
-            std::string rendered_str = renderer.render();
+        //TODO: extract this to func/method in html_renderer
+        HTML_Renderer renderer(base_body);
 
-            std::cout << "rendered string: " << rendered_str << '\n';
+        size_t pos = msg->find(to_find);
 
-            if(pos != std::string::npos)
-            {
-                std::cout << "found body mark\n";
-                msg->replace(pos, to_find.size(), rendered_str);
-            }
+        std::string rendered_str = renderer.render();
 
+        std::cout << "rendered string: " << rendered_str << '\n';
+
+        if(pos != std::string::npos)
+        {
+            std::cout << "found body mark\n";
+            msg->replace(pos, to_find.size(), rendered_str);
         }
 
     }
@@ -326,7 +314,6 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
         msg->replace(pos, to_find.size(), renderer.render());
     }
 
-    //TODO: fix error and only display when html is provided
     std::ofstream f("index_debug.html");
     f << *msg;
     f.close();
@@ -363,10 +350,6 @@ void update_projects(std::string *msg, std::string *query, ProjectArchive *proj_
         (*ptr)->description = value;
         (*ptr)->finished = json["finished"].get_as<bool>();
     }
-    else if(auto ptr = std::get_if<Comment*>(&elem))
-    {
-        (*ptr)->text = value;
-    } 
     else
     {
         std::cerr << "Unknow element type\n";

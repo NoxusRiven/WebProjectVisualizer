@@ -12,12 +12,11 @@
 
 #define PROJECTS_PATH "files/TODO/project.json"
 
-// Element;typedef std::variant<Project, Objective, Task, Comment> Element
+// Element;typedef std::variant<Project, Objective, Task> Element
 using ElementPtr = std::variant<
     Project*,
     Objective*,
-    Task*,
-    Comment*
+    Task*
 >;
 
 struct ProjectArchive

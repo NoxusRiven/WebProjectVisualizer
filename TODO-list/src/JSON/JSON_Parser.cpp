@@ -74,7 +74,7 @@ namespace JSON
         if (first.type != Token::LeftBrace)
         {
             std::cerr << "JSON must start with '{'\n";
-            exit(-1);
+            return JsonValue();
         }
 
         _root = parse_object(stream);

@@ -24,15 +24,6 @@ public:
     void mark_unfinished();
 };
 
-struct Comment
-{
-    long id;
-
-    std::string text;
-
-    Comment(long id, std::string content);
-};
-
 class Objective
 {
 public:
@@ -40,14 +31,11 @@ public:
 
     std::string name;
     Priority priority;
-    std::vector<Comment> comments;
     std::vector<Task> tasks;
 
     Objective(long id, std::string name, Priority priority);
 
-    // check if types are either string (comment) or Task commes shoud be prefixed with '//'
-    void add(std::string data);
-
+    void add(Task task);
 };
 
 class Project
