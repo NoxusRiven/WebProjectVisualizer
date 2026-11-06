@@ -1,0 +1,10 @@
+.vscode
+
+#for now those are not implemented so no point commiting them
+FuncVisualizer
+PassKeeper
+
+WebServer-ProjectTODO/index_debug.html
+WebServer-ProjectTODO/bin
+
+WebServer-ProjectTODO/files/TODO/project_copy.json

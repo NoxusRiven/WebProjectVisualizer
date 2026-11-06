@@ -302,8 +302,7 @@ void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_ar
         base_list.append(
             DomElement("p")
                 .append(
-                    DomElement("a").set_attr({  {"href", ("?project=" + proj.name)},
-                                                {"onclick", "currentLink(this)"}})
+                    DomElement("a").set_attr({  {"href", ("?project=" + proj.name)} })
                         .append(proj.name)
                 )
             );

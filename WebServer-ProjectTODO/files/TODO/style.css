@@ -12,10 +12,16 @@ body
     color: whitesmoke;
 }
 
+
 button
 {
     display: block;
-    margin-top: 20px;
+	border-radius: 7px;
+	border: 2px solid;
+	cursor: pointer;
+	padding: 2px 6px 2px 6px;
+	border-color: transparent;
+	box-sizing: border-box;
 }
 
 p 
@@ -54,9 +60,11 @@ p
     color: #b3b3b3;
 }
 
-.highlight
+.project_list a.highlight
 {
-    color: #6e3e3e;
+    /*PINK: #ffc1C6*/
+    color: #ffc1C6;
+    font-weight: bold;
 }
 
 /* ---------- todo form ---------- */

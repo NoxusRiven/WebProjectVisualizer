@@ -6,20 +6,67 @@
 "objectives": [
 {
 "id": 2,
-"name": "finish parsing json",
+"name": "Implement delete",
+"priority": 1,
+"comments": [
+],
+"tasks": [
+]
+},
+{
+"id": 13,
+"name": "remove comments from project",
 "priority": 2,
 "comments": [
-{
-"id": 10,
-"text": "comments should be more"
-}
 ],
 "tasks": [
 {
-"id": 3,
+"id": 14,
 "finished": false,
-"description": "look into error with saving to json file"
+"description": "check for all instances of comments"
+},
+{
+"id": 15,
+"finished": false,
+"description": "fix all bugs after removing"
 }
+]
+},
+{
+"id": 16,
+"name": "add sorting based on priority",
+"priority": 0,
+"comments": [
+],
+"tasks": [
+]
+},
+{
+"id": 17,
+"name": "add visual blocks for objectives in web",
+"priority": 0,
+"comments": [
+],
+"tasks": [
+{
+"id": 18,
+"finished": false,
+"description": "ceate divs that will contain obj div and all task divs"
+},
+{
+"id": 19,
+"finished": false,
+"description": "make them good looking (color maybe blue-grayish)"
+}
+]
+},
+{
+"id": 24,
+"name": "remove from remote repo unnessecery files and folders",
+"priority": 2,
+"comments": [
+],
+"tasks": [
 ]
 }
 ]
@@ -42,7 +89,7 @@
 },
 {
 "id": 7,
-"finished": false,
+"finished": true,
 "description": "create endpoint for this project"
 },
 {
@@ -52,8 +99,47 @@
 },
 {
 "id": 9,
-"finished": false,
+"finished": true,
 "description": "draw custom function and output is coresponding funcion"
+}
+]
+}
+]
+},
+{
+"id": 20,
+"name": "Test",
+"objectives": [
+{
+"id": 11,
+"name": "medium obj",
+"priority": 1,
+"comments": [
+],
+"tasks": [
+{
+"id": 12,
+"finished": true,
+"description": "test1"
+}
+]
+},
+{
+"id": 21,
+"name": "whatever important",
+"priority": 2,
+"comments": [
+],
+"tasks": [
+{
+"id": 22,
+"finished": false,
+"description": "and it's task"
+},
+{
+"id": 23,
+"finished": false,
+"description": "there is second one"
 }
 ]
 }

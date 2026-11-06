@@ -53,6 +53,7 @@ enum class HTTP_Method
     GET,
     POST,
     PUT,
+    DELETE,
 
 
     PATCH,

@@ -3,11 +3,11 @@ const path = "/TODO";
 let editingElement = null;
 let addingElement = null;
 
-// document.querySelectorAll("a").forEach(a => {
-//     log.console("a: ", a)
-//     log.console("link: ", link)
-//     a.classList.toggle("highlight", a === link);
-// });
+// Pobierz wszystkie linki z menu
+const projLinks = document.querySelectorAll('.project_list a');
+
+// Pobierz aktualną ścieżkę (np. "/oferta.html")
+const currentPath = window.location;
 
 document.addEventListener("change", onChange);
 document.addEventListener("dblclick", onDoubleClick);
@@ -35,17 +35,17 @@ document.addEventListener("mousedown", (e) =>
     addingElement.submit();
 });
 
-function currentLink(link)
+projLinks.forEach(link => 
 {
-    console.log("link: ", link)
-    document.querySelectorAll("a").forEach(a => {
-        console.log("a :", a)
-        a.classList.remove("highlight");
-    });
-
-    link.classList.add("highlight");
-    console.log("link: ", link)
-}
+  // Sprawdzamy, czy href linku pasuje do obecnej ścieżki
+  // Używamy .pathname z obiektu URL, aby obsłużyć też pełne adresy
+    const linkUrl = new URL(link.href, window.location.origin);
+    
+    if (linkUrl.href === currentPath.href)
+    {
+        link.classList.add('highlight');
+    }
+});
 
 function onDoubleClick(event)
 {
