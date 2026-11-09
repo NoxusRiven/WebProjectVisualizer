@@ -3,10 +3,8 @@ const path = "/TODO";
 let editingElement = null;
 let addingElement = null;
 
-// Pobierz wszystkie linki z menu
 const projLinks = document.querySelectorAll('.project_list a');
 
-// Pobierz aktualną ścieżkę (np. "/oferta.html")
 const currentPath = window.location;
 
 document.addEventListener("change", onChange);
@@ -37,8 +35,6 @@ document.addEventListener("mousedown", (e) =>
 
 projLinks.forEach(link => 
 {
-  // Sprawdzamy, czy href linku pasuje do obecnej ścieżki
-  // Używamy .pathname z obiektu URL, aby obsłużyć też pełne adresy
     const linkUrl = new URL(link.href, window.location.origin);
     
     if (linkUrl.href === currentPath.href)
@@ -110,22 +106,41 @@ function startEditing(parent)
     });
 }
 
-function finishEditing(parent)
+function finishEditing(elem)
 {
-    if (!parent)
+    if (!elem)
         return;
 
-    const input = parent.querySelector("input:not([type='checkbox'])");
+    const input = elem.querySelector("input:not([type='checkbox'])");
 
+    console.log("input: ", input)
     if (input)
     {
-        const p = parent.querySelector("p");
+        const p = elem.querySelector("p");
+        const parentDiv = p.closest("div")
 
         p.textContent = input.value.trim();
 
+        let isTask = false;
+        for(const c of parentDiv.classList)
+        {
+            if(c === "task")
+            {
+                isTask = true;
+                break;
+            }
+        }
+
+        if(isTask && p.textContent === "")
+        {
+            remove(elem)
+            return;
+        }
+        
+
         input.remove();
 
-        for (const child of parent.children)
+        for (const child of elem.children)
         {
             child.style.display = "";
         }
@@ -133,7 +148,7 @@ function finishEditing(parent)
 
     editingElement = null;
 
-    put(parent);
+    put(elem);
 }
 
 function onChange(event)
@@ -269,7 +284,7 @@ function addElement(btn)
                 request.priority = 2;
         }
 
-        fetch("/TODO", {
+        fetch(path, {
             method: "POST",
             headers:
             {
@@ -310,7 +325,67 @@ function addElement(btn)
 
 }
 
-function put(parent)
+function findNearestElement(elem, selector) {
+    const matches = Array.from(document.querySelectorAll(selector));
+    if (matches.length === 0) return null;
+
+    // Pobieramy pozycję bazowego elementu w dokumencie
+    const elemRect = elem.getBoundingClientRect();
+
+    let closest = null;
+    let minDistance = Infinity;
+
+    matches.forEach(match => {
+        const matchRect = match.getBoundingClientRect();
+        
+        const distance = Math.abs(matchRect.top - elemRect.top);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            closest = match;
+        }
+    });
+
+    return closest;
+}
+
+function remove(elem)
+{
+    const del = 
+    {
+        id: Number(elem.dataset.id)
+    };
+
+    //just for task, later destinguish them
+
+    //search recursivly through whole document to find objects
+    del.objID = Number(findNearestElement(elem, ".objective")?.dataset.id);
+    del.projID = Number(findNearestElement(elem, ".obj-indent")?.dataset.parent);
+
+    fetch(path, 
+    {
+        method: "DELETE",
+        headers:
+        {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(del)
+    });
+
+    //console.log("elem: ", elem.children.);
+    for(const child of elem.children)
+    {
+        if(child.nodeName === "INPUT")
+        {
+            child.remove();
+        }
+    }
+
+    console.log("elem: ", elem.children);
+    //location.reload();
+}
+
+function put(elem)
 {
     fetch(path,
     {
@@ -319,7 +394,7 @@ function put(parent)
         {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(createPut(parent))
+        body: JSON.stringify(createPut(elem))
     });
 }
 

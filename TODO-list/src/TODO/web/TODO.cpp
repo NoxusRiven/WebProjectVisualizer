@@ -332,7 +332,7 @@ void update_projects(std::string *msg, std::string *query, ProjectArchive *proj_
     auto it = proj_arch->elements.find(id);
     if (it == proj_arch->elements.end())
     {
-        std::cerr << "Unknown id " << std::to_string(id) << "\n";
+        std::cerr << "update_projects: Unknown id " << std::to_string(id) << "\n";
         return;
     }
 
@@ -446,6 +446,57 @@ void add_element(std::string *msg, std::string *query, ProjectArchive *proj_arch
     else
     {
         std::cerr << "Unexpected element type " << elem_type << '\n';
+        return;
+    }
+
+    save_projects_json(PROJECTS_PATH, proj_arch);
+}
+
+void delete_element(std::string *msg, std::string *query, ProjectArchive *proj_arch)
+{
+    JSON::JSON_Parser parser;
+    auto json = parser.parse(*msg);
+
+    long id = json["id"].get_as<double>();
+    long projID = json["projID"].get_as<double>();
+
+    auto it = proj_arch->elements.find(id);
+    if (it == proj_arch->elements.end())
+    {
+        std::cerr << "update_projects: Unknown id " << std::to_string(id) << "\n";
+        return;
+    }
+
+    auto& elem = it->second;
+
+    //for now projects are not supported
+    if(auto ptr = std::get_if<Objective*>(&elem))
+    {
+        std::cout << "delete_element(): Found objective even if it was not supported\n";
+    }
+    else if(auto ptr = std::get_if<Task*>(&elem))
+    {
+        long objID = json["objID"].get_as<double>();
+
+        for(auto& p : proj_arch->projects)
+        {
+            if(p.id == projID)
+            {
+                for(auto& o : p.objectives)
+                {
+                    if(o.id == objID)
+                    {
+                        std::erase(o.tasks, (**ptr));
+                    }
+                }
+            }
+        }
+
+        proj_arch->elements.erase(it);
+    }
+    else
+    {
+        std::cerr << "Unknow element type\n";
         return;
     }
 

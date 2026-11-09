@@ -33,3 +33,4 @@ void save_projects_json(std::string_view file_name, ProjectArchive *proj_arch);
 void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_arch);
 void update_projects(std::string *msg, std::string *query, ProjectArchive *proj_arch);
 void add_element(std::string *msg, std::string *query, ProjectArchive *proj_arch);
+void delete_element(std::string *msg, std::string *query, ProjectArchive *proj_arch);

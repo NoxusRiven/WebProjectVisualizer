@@ -17,11 +17,11 @@ button
 {
     display: block;
 	border-radius: 7px;
-	border: 2px solid;
 	cursor: pointer;
 	padding: 2px 6px 2px 6px;
 	border-color: transparent;
 	box-sizing: border-box;
+    margin-bottom: 20px;
 }
 
 p 
@@ -96,7 +96,7 @@ p
     align-items: center;
     gap: 12px;
     padding: 0 5%;
-    margin-top: 24px;
+    margin-top: 20px;
 }
 
 .task 

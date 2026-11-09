@@ -22,6 +22,11 @@ public:
 
     void mark_finished();
     void mark_unfinished();
+
+    //needed for erase
+    bool operator==(const Task& other) const {
+        return this->id == other.id;
+    }
 };
 
 class Objective

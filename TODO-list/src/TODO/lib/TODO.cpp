@@ -40,10 +40,8 @@ Objective::Objective(long id, std::string name, Priority priority) : id(id), nam
 }
 
 
-//TODO: fix id in this method
 void Objective::add(Task task)
 {
-    
     this->tasks.push_back(task);
 }
 

@@ -17,7 +17,7 @@ enum class HTTP_Code
 
     NOT_FOUND = 404,
 
-    INTERNAL_SERVER_codeOR = 500,
+    INTERNAL_SERVER_ERROR = 500,
     NOT_IMPLEMENTED = 501, 
 };
 
@@ -25,16 +25,23 @@ std::string to_string(HTTP_Code ec)
 {
     switch (ec)
     {
-    case HTTP_Code::NOT_FOUND:
-        return "NOT_FOUND";
-
     case HTTP_Code::OK:
         return "OK";
 
     case HTTP_Code::CREATED:
         return "CREATED";
+
+    case HTTP_Code::NO_CONTENT:
+        return "NO_CONTENT";
     
+    case HTTP_Code::NOT_FOUND:
+        return "NOT_FOUND";
     
+    case HTTP_Code::INTERNAL_SERVER_ERROR:
+        return "INTERNAL_SERVER_ERROR";
+    
+    case HTTP_Code::NOT_IMPLEMENTED:
+        return "NOT_IMPLEMENTED";
     
     default:
         return "NULL";
@@ -64,9 +71,12 @@ std::string to_string(Method m)
 {
     switch (m)
     {
+    case Method::HEAD:
+        return "HEAD";
+    
     case Method::GET:
         return "GET";
-    
+   
     case Method::POST:
         return "POST";
     
@@ -75,7 +85,10 @@ std::string to_string(Method m)
     
     case Method::PATCH:
         return "PATCH";
-
+   
+    case Method::DELETE:
+        return "DELETE";
+ 
     case Method::NONE:
     default:
         return "NULL";
@@ -235,13 +248,16 @@ asio::awaitable<void> WebServer::call_todo_func(std::string *content, std::strin
     {
         func = add_element;
     }
+    else if(_http_request._method == Method::DELETE)
+    {
+        func = delete_element;
+    }
 
     co_await asio::co_spawn(
         _strand,
         [this, func, content, query]() -> asio::awaitable<void>
         {
             func(content, query, &_proj_arch);
-
             co_return;
         },
         asio::use_awaitable
@@ -409,6 +425,10 @@ asio::awaitable<bool> WebServer::handle_request(std::string *request, std::strin
     {
         _http_request._method = Method::PUT;
     }
+    else if(start_line.starts_with("DELETE"))
+    {
+        _http_request._method = Method::DELETE;
+    }
     
     //if none method is unimplemented - return with message   
     if(_http_request._method == Method::NONE)
@@ -530,17 +550,25 @@ asio::awaitable<bool> WebServer::handle_request(std::string *request, std::strin
                 + contents;
         }
     }
-    if(_http_request._method == Method::PUT || _http_request._method == Method::POST)
+    if( _http_request._method == Method::PUT    || 
+        _http_request._method == Method::POST   ||
+        _http_request._method == Method::DELETE )
     {
         code = HTTP_Code::NOT_IMPLEMENTED;
         std::string contents = _http_request._body;
 
-        //std::cout << "#### patch handle request, request: ####\n" << contents;
-
         if(_route_func)
         {
-            //std::cout << "route func present\n";
-            code = (_http_request._method == Method::PUT) ? HTTP_Code::OK : HTTP_Code::CREATED;
+            if(_http_request._method == Method::POST)
+            {
+                code = HTTP_Code::CREATED;
+            }
+            else
+            {
+                //TODO: later if possible change this to ok and provide content
+                code = HTTP_Code::NO_CONTENT;
+            }
+
             co_await _route_func(&contents, &query);
         }
         
