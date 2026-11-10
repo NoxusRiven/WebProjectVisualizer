@@ -30,6 +30,9 @@ std::string to_lower(std::string data);
 void read_projects_json(std::string_view file_name, ProjectArchive *proj_arch);
 void save_projects_json(std::string_view file_name, ProjectArchive *proj_arch);
 
+bool objective_compare(Objective a, Objective b);
+void sort_projects(std::vector<Project> *projects);
+
 void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_arch);
 void update_projects(std::string *msg, std::string *query, ProjectArchive *proj_arch);
 void add_element(std::string *msg, std::string *query, ProjectArchive *proj_arch);

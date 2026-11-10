@@ -3,8 +3,6 @@ const path = "/TODO";
 let editingElement = null;
 let addingElement = null;
 
-const projLinks = document.querySelectorAll('.project_list a');
-
 const currentPath = window.location;
 
 document.addEventListener("change", onChange);
@@ -33,15 +31,20 @@ document.addEventListener("mousedown", (e) =>
     addingElement.submit();
 });
 
-projLinks.forEach(link => 
+function highLighCurrentLink()
 {
-    const linkUrl = new URL(link.href, window.location.origin);
-    
-    if (linkUrl.href === currentPath.href)
+    const projLinks = document.querySelectorAll('.project_list a');
+    projLinks.forEach(link => 
     {
-        link.classList.add('highlight');
-    }
-});
+        const linkUrl = new URL(link.href, window.location.origin);
+        
+        if (linkUrl.href === currentPath.href)
+        {
+            link.classList.add('highlight');
+        }
+    });
+}
+highLighCurrentLink()
 
 function onDoubleClick(event)
 {
@@ -196,6 +199,26 @@ function onClick(event)
     }
 }
 
+async function reloadWithGet()
+{
+    const pathWithQuery = currentPath.pathname + currentPath.search
+
+    //get request
+    const response = await fetch(pathWithQuery, { method: "GET", headers: { "Content-Type": "Content-Type: text/html; charset=utf-8", "Accept": "text/html" } });
+    const html = await response.text();
+
+    const parser = new DOMParser();
+    
+    //update inner html
+    const doc = parser.parseFromString(html, 'text/html');
+    const newHtml = doc.querySelector("html").innerHTML;
+    document.querySelector("html").innerHTML = newHtml;
+
+    //
+    highLighCurrentLink()
+}
+
+
 //TODO: web side adding new form and then when data was inputed by user sending it 
 // to server for saving and adding id
 //callback from html
@@ -262,7 +285,7 @@ function addElement(btn)
 
 
     
-    function submit()
+    async function submit()
     {
         const value = input.value;
 
@@ -299,10 +322,12 @@ function addElement(btn)
 
             base.remove();
             addingElement = null;
-
-            location.reload();
         })
         .catch(console.error);
+
+        /*await*/ reloadWithGet()
+        
+        
     }
 
     base.submit = submit 
@@ -380,9 +405,6 @@ function remove(elem)
             child.remove();
         }
     }
-
-    console.log("elem: ", elem.children);
-    //location.reload();
 }
 
 function put(elem)

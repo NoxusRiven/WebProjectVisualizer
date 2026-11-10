@@ -1,4 +1,9 @@
 #include "TODO.hpp"
+#include <algorithm>
+
+//#####################################################################
+//                          HELPER FUNCTIONS
+//#####################################################################
 
 std::string to_lower(std::string data) 
 {
@@ -111,6 +116,9 @@ void read_projects_json(std::string_view file_name, ProjectArchive* proj_arch)
 void save_projects_json(std::string_view file_name, ProjectArchive *proj_arch)
 {
     auto *projects = &proj_arch->projects;
+    
+    sort_projects(projects);
+    
     std::ofstream json_file(file_name.data());
 
     json_file << "{\n";
@@ -177,6 +185,25 @@ void save_projects_json(std::string_view file_name, ProjectArchive *proj_arch)
     json_file << "]\n";
     json_file << "}\n";
 }
+
+bool objective_compare(Objective a, Objective b)
+{
+    return a.priority > b.priority;
+}
+
+void sort_projects(std::vector<Project> *projects)
+{
+    auto& projects_tmp = *projects;
+
+    for(auto& proj : projects_tmp)
+    {
+        std::sort(proj.objectives.begin(), proj.objectives.end(), objective_compare);
+    }
+}
+
+//#####################################################################
+//                         CORE FUNCTION 
+//#####################################################################
 
 void show_projects(std::string *msg, std::string *query, ProjectArchive *proj_arch)
 {
